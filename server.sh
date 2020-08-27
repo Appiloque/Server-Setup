@@ -1,4 +1,5 @@
 #!/bin/bash
+
 read -p "Have you save crontab file for the first time? [y/n] " CRON
 if [ $CRON == "y" ]
 then
@@ -40,10 +41,14 @@ then
 				if [ $SITETYPE == 1 ]
 				then
 					SITETYPE="wp"
+					ADMINUSER="--admin-user=appiloque"
+					ADMINEMAIL="--admin-email=xiuting.chan@appiloque.com"
 					break
 				elif [ $SITETYPE == 2 ]
 				then
 					SITETYPE="html"
+					ADMINUSER=""
+					ADMINEMAIL=""
 					break
 				else
 					echo Invalid input! Please enter 1 or 2.
@@ -70,7 +75,7 @@ then
 
 			#CREATE SITE
 			echo START CREATING SITE
-			sudo ee site create $SITE --type=$SITETYPE $CERT --admin-user=appiloque --admin-email=xiuting.chan@appiloque.com
+			sudo ee site create $SITE --type=$SITETYPE $CERT $ADMINUSER $ADMINEMAIL
 			echo DONE CREATING SITE
 
 			#SFTP SETUP
@@ -100,25 +105,27 @@ then
 			(crontab -l ; echo "0 0 * * 0 /usr/local/bin/ee site ssl-renew --all >> /opt/easyengine/logs/cron.log 2>&1")| crontab -
 			echo ADDING CRONS SUCCESSFULLY
 
-			echo START CHANGING LOGIN SLUG 
-			sed -i '25i location ~* /admin/ {' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			sed -i '26i     rewrite ^/admin/(.*) /wp-admin/$1 last;' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			sed -i '27i }' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			sed -i '28i location = /login {' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			sed -i '29i   rewrite ^(.*)$ /wp-login.php;' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			sed -i '30i }' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
-			echo CHANGE PHP NGINX CONFIGURATION SUCCESSFULLY 
-			#wp-config
-			echo START MODIFYING WP-CONFIG
-			sed  -i "/That's all, stop editing! Happy publishing./i//CHANGE LOGIN SLUG" /opt/easyengine/sites/$SITE/app/wp-config.php
-			sed  -i "/That's all, stop editing! Happy publishing./i//define('WP_ADMIN_DIR', 'admin');" /opt/easyengine/sites/$SITE/app/wp-config.php
-			sed  -i "/That's all, stop editing! Happy publishing./i//define('ADMIN_COOKIE_PATH', SITECOOKIEPATH . WP_ADMIN_DIR);" /opt/easyengine/sites/$SITE/app/wp-config.php
-			echo MODIFYING WP-CONFIG SUCCESSFULLY
-
-			echo RESTARTING NGINX
-			ee site restart $SITE --nginx
-			echo DONE CHANGING LOGIN SLUG 
-
+			if [ $SITETYPE == "wp" ]
+			then
+				echo START CHANGING LOGIN SLUG 
+				sed -i '25i location ~* /admin/ {' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				sed -i '26i     rewrite ^/admin/(.*) /wp-admin/$1 last;' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				sed -i '27i }' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				sed -i '28i location = /login {' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				sed -i '29i   rewrite ^(.*)$ /wp-login.php;' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				sed -i '30i }' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
+				echo CHANGE PHP NGINX CONFIGURATION SUCCESSFULLY 
+				#wp-config
+				echo START MODIFYING WP-CONFIG
+				sed  -i "/That's all, stop editing! Happy publishing./i//CHANGE LOGIN SLUG" /opt/easyengine/sites/$SITE/app/wp-config.php
+				sed  -i "/That's all, stop editing! Happy publishing./i//define('WP_ADMIN_DIR', 'admin');" /opt/easyengine/sites/$SITE/app/wp-config.php
+				sed  -i "/That's all, stop editing! Happy publishing./i//define('ADMIN_COOKIE_PATH', SITECOOKIEPATH . WP_ADMIN_DIR);" /opt/easyengine/sites/$SITE/app/wp-config.php
+				echo MODIFYING WP-CONFIG SUCCESSFULLY
+				#restart site service
+				echo RESTARTING NGINX
+				ee site restart $SITE --nginx
+				echo DONE CHANGING LOGIN SLUG 
+			fi
 			#show site info
 			ee site info $SITE
 			break
