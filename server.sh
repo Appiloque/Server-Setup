@@ -108,6 +108,12 @@ then
 			sed -i '29i   rewrite ^(.*)$ /wp-login.php;' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
 			sed -i '30i }' /opt/easyengine/sites/$SITE/config/nginx/conf.d/main.conf
 			echo CHANGE PHP NGINX CONFIGURATION SUCCESSFULLY 
+			#wp-config
+			echo START MODIFYING WP-CONFIG
+			sed  -i "/That's all, stop editing! Happy publishing./i//CHANGE LOGIN SLUG" /opt/easyengine/sites/$SITE/app/wp-config.php
+			sed  -i "/That's all, stop editing! Happy publishing./i//define('WP_ADMIN_DIR', 'admin');" /opt/easyengine/sites/$SITE/app/wp-config.php
+			sed  -i "/That's all, stop editing! Happy publishing./i//define('ADMIN_COOKIE_PATH', SITECOOKIEPATH . WP_ADMIN_DIR);" /opt/easyengine/sites/$SITE/app/wp-config.php
+			echo MODIFYING WP-CONFIG SUCCESSFULLY
 
 			echo RESTARTING NGINX
 			ee site restart $SITE --nginx
