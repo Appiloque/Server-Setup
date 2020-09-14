@@ -42,7 +42,7 @@ then
 				then
 					SITETYPE="wp"
 					ADMINUSER="--admin-user=appiloque"
-					ADMINEMAIL="--admin-email=xiuting.chan@appiloque.com"
+					ADMINEMAIL="--admin-email=dev@appiloque.com"
 					break
 				elif [ $SITETYPE == 2 ]
 				then
