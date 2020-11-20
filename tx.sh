@@ -47,10 +47,10 @@ do
 		service ssh restart
 		echo DONE RESTARTING SERVICE
 		#give permission
-		echo GIVING PERMISION
+		echo GIVING PERMISSION
 		chmod g+x /var/lib/docker/volumes
 		chgrp www-data /var/lib/docker/volumes
-		echo DONE GIVING PERMISION
+		echo DONE GIVING PERMISSION
 		#END OF SFTP SETUP
 
 		#ADD NEW SFTP USER
