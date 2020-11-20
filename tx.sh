@@ -68,9 +68,9 @@ do
 		chown root:root /home/
 		echo DONE SETTING UP PERMISSION
 
-		#change entire line 115 from /usr/lib/openssh/sftp-server to internal-sftp
+		#change entire line 116 from /usr/lib/openssh/sftp-server to internal-sftp
 		echo CHANGING /usr/lib/openssh/sftp-server to internal-sftp in /etc/ssh/sshd_config
-		sed -i '115s_.*_Subsystem	sftp	internal-sftp_' /etc/ssh/sshd_config
+		sed -i '116s_.*_Subsystem	sftp	internal-sftp_' /etc/ssh/sshd_config
 		echo ADDING CHROOT
 		echo "Match group www-data" >> /etc/ssh/sshd_config
 		echo "X11Forwarding no" >> /etc/ssh/sshd_config
